@@ -1,9 +1,12 @@
 const pokemonContainerElement = document.getElementById("pokemon-container");
 const buttonElement = document.getElementById("watch-more");
 let offset = 0;
-
-function fetchData() {
-  return fetch(`https://pokeapi.co/api/v2/pokemon?offset=${offset}&limit=20`)
+const limitInputElement = document.getElementById("limit-input");
+let limit = 20;
+function fetchData(limit) {
+  return fetch(
+    `https://pokeapi.co/api/v2/pokemon?offset=${offset}&limit=${limit}`
+  )
     .then((res) => {
       return res.json();
     })
@@ -27,16 +30,19 @@ function fetchData() {
         pokemonContainerElement.appendChild(cardElement);
       });
 
-      return pokemons.length;
+      return offset + pokemons.length;
     });
 }
 
-fetchData().then((pokemonNumber) => {
-  offset += pokemonNumber;
-});
-
 buttonElement.addEventListener("click", () => {
-  fetchData().then((pokemonNumber) => {
-    offset += pokemonNumber;
+  let limitNow = parseInt(limitInputElement.value);
+  if (!isNaN(limitNow) && limitNow > 0) {
+    limit = limitNow;
+  } else {
+    limit = 20;
+    limitInputElement.value = "20";
+  }
+  fetchData(limit).then((pokemonNumber) => {
+    offset = pokemonNumber;
   });
 });
